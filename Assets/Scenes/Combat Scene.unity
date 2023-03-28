@@ -1167,6 +1167,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55d0178cdf7e7364bb3836c82a0336bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerActionButtons:
+  - {fileID: 2137933018}
+  - {fileID: 1385258577}
+  - {fileID: 966101114}
   CannonFire: 0000000001000000020000000300000004000000
   cannonUI: {fileID: 1231761426}
 --- !u!4 &704049921
@@ -3185,14 +3189,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: FireCannons
-        m_Mode: 1
+        m_MethodName: PlayerAction
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: FireCannons
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2137933019

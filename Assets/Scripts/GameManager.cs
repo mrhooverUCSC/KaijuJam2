@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] Button[] playerActionButtons;
     #region cannon variables
     [SerializeField] List<int> CannonFire;
     int currentCannon;
@@ -21,6 +22,30 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         
+    }
+    public void PlayerAction(string action)
+    {
+        //call the approrpriate action
+        if(action == "FireCannons")
+        {
+            FireCannons();
+        }
+        //disable the player buttons until their next turn
+        foreach(Button b in playerActionButtons)
+        {
+            b.interactable = false;
+        }
+    }
+    void EnemyTurn()
+    {
+        ReadyPlayerTurn();
+    }
+    void ReadyPlayerTurn()
+    {
+        foreach (Button b in playerActionButtons)
+        {
+            b.interactable = true;
+        }
     }
     #region FireCannons
     //4 cannons fire, in a random order. Press them in the correct order
@@ -68,12 +93,21 @@ public class GameManager : MonoBehaviour
         currentCannon++;
         if(currentCannon == 5)
         {
-            CheckCannons();
+            StartCoroutine(CheckCannons());
         }
     }
-    void CheckCannons()
+    IEnumerator CheckCannons()
     {
         cannonUI.transform.GetChild(5).GetComponent<Image>().color = Color.green;
+        yield return new WaitForSeconds(.5f);
+        //hide the info
+        for(int i = 0; i < 11; ++i)
+        {
+            cannonUI.transform.GetChild(i).gameObject.SetActive(false);
+        }
+        //deal damage
+        yield return new WaitForSeconds(.5f);
+        EnemyTurn();
     }
     #endregion
     //list shuffler
