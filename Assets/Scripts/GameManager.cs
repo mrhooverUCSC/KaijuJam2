@@ -8,9 +8,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button[] playerActionButtons;
     #region cannon variables
     [SerializeField] List<int> CannonFire;
+    [SerializeField] List<int> ScenarioLineup;
+    [SerializeField] List<int> SolutionLineup;
     int currentCannon;
     int currentCannonFails;
     [SerializeField] GameObject cannonUI;
+    [SerializeField] GameObject medicUI;
     #endregion
     // Start is called before the first frame update
     void Start()
@@ -26,10 +29,12 @@ public class GameManager : MonoBehaviour
     public void PlayerAction(string action)
     {
         //call the approrpriate action
-        if(action == "FireCannons")
-        {
+        if(action == "FireCannons") {
             FireCannons();
+        } else if(action == "MedicSquad") {
+            MedicSquad();
         }
+
         //disable the player buttons until their next turn
         foreach(Button b in playerActionButtons)
         {
@@ -111,6 +116,29 @@ public class GameManager : MonoBehaviour
     }
     #endregion
     //list shuffler
+
+    #region MedicSquad
+    public void MedicSquad() {
+        StartCoroutine(organize());
+    }
+
+    public IEnumerator organize() {
+        Shuffle(ScenarioLineup);
+        Shuffle(SolutionLineup);
+
+        for(int i = 0; i < ScenarioLineup.Count; i++) {
+            medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).position = medicUI.transform.GetChild(2).GetChild(i).position;
+            medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).position = medicUI.transform.GetChild(3).GetChild(i).position;
+        }
+
+        medicUI.transform.gameObject.SetActive(true);
+        
+        yield return new WaitForSeconds(5.0f);
+        medicUI.transform.gameObject.SetActive(false);
+        EnemyTurn();
+    }
+    #endregion
+
     static void Shuffle<T>(List<T> ts)
     {
         var count = ts.Count;
