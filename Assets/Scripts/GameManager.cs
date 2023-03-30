@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator fire()
     {
+        //CinematicCameraManager.instance.CameraStaticFocus(playerFocusObj);
         //shuffle the inputs
         Shuffle(CannonFire);
         currentCannon = 0;
@@ -137,6 +138,8 @@ public class GameManager : MonoBehaviour
         //deal damage
         yield return new WaitForSeconds(.5f);
         EnemyTurn();
+        //CinematicCameraManager.instance.ChangeCameraMode(CinematicCameraManager.CameraMode.DYNAMIC);
+        //CinematicCameraManager.instance.Reset();
     }
     #endregion
 
