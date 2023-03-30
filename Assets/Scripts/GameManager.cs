@@ -26,17 +26,24 @@ public class GameManager : MonoBehaviour
     // medic variables
     [SerializeField] List<int> ScenarioLineup;
     [SerializeField] List<int> SolutionLineup;
+    [SerializeField] List<string> ScenarioOrder;
+    [SerializeField] List<string> SolutionOrder;
     [SerializeField] GameObject medicUI;
+    [SerializeField] List<bool> pairings;
+    [SerializeField] bool holdingButtonChoice;
+    [SerializeField] string choiceOpt;
 
     // Start is called before the first frame update
-    void Start()
-    {
-
+    void Start() {
+        pairings.Clear();
+        holdingButtonChoice = false;
+        ScenarioOrder.Clear();
+        SolutionOrder.Clear();
+        choiceOpt = "";
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         
     }
     public void PlayerAction(string action)
@@ -134,6 +141,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region MedicSquad
+    // i am sorry for fucking up this code -Ivan
     public void MedicSquad() {
         StartCoroutine(organize());
     }
@@ -142,17 +150,61 @@ public class GameManager : MonoBehaviour
         Shuffle(ScenarioLineup);
         Shuffle(SolutionLineup);
 
+        // 0: scenarios, 1: solutions, 2: scenario positions, 3: solution positions
         for(int i = 0; i < ScenarioLineup.Count; i++) {
             medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).position = medicUI.transform.GetChild(2).GetChild(i).position;
+            ScenarioOrder.Add(medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).name);
+            // medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).GetComponent<SquadChoice>().indexOfChoice = i;
+
             medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).position = medicUI.transform.GetChild(3).GetChild(i).position;
+            SolutionOrder.Add(medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).name);
+            // medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).GetComponent<SquadChoice>().indexOfChoice = i;
+            
         }
 
         medicUI.transform.gameObject.SetActive(true);
         
-        yield return new WaitForSeconds(5.0f);
+        yield return new WaitForSeconds(20.0f);
         medicUI.transform.gameObject.SetActive(false);
         EnemyTurn();
     }
+
+    // type = 0 -> scenario, type = 1 -> solution
+    public void GrabButtonInput(string choice) {
+        if(holdingButtonChoice) {
+            if(ScenarioOrder.Contains(choice)) {    // it is a scenario obj
+                if(ScenarioOrder.Contains(choiceOpt)) {     // if we are choosing a button that is in the same row
+                    choiceOpt = choice;
+                } else {    // both the one we are holding and the new one receiving are different types, continue on
+                    ComparePairings(ScenarioOrder.IndexOf(choice), SolutionOrder.IndexOf(choiceOpt));
+                }
+            } else if(SolutionOrder.Contains(choice)) {     // it is a solution obj
+                if(SolutionOrder.Contains(choiceOpt)) {     // if we are choosing button that's in same row, swap
+                    choiceOpt = choice;
+                } else {        // both choices are different, we compare
+                    ComparePairings(ScenarioOrder.IndexOf(choiceOpt), SolutionOrder.IndexOf(choice));
+                }
+
+            } else {    // something messed up?
+                Debug.Log("BAD ERROR??");
+            }
+
+
+        } else if(!holdingButtonChoice) {
+            holdingButtonChoice = true;    // if they are not holding a choice yet, they are now :)
+            choiceOpt = choice;
+        }
+
+    }
+
+    public void ComparePairings(int sc_index, int so_index) {
+        if(ScenarioLineup[sc_index] == SolutionLineup[so_index]) { pairings.Add(true); }
+        else { pairings.Add(false); }
+        ScenarioLineup.RemoveAt(sc_index);
+        SolutionLineup.RemoveAt(so_index);
+        holdingButtonChoice = false;        // empties out the object list
+    }
+
     #endregion
 
     #region BlowPitfall
