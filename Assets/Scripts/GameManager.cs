@@ -1,24 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] Button[] playerActionButtons;
-    #region cannon variables
+
+    //cannon variables
     [SerializeField] List<int> CannonFire;
-    [SerializeField] List<int> ScenarioLineup;
-    [SerializeField] List<int> SolutionLineup;
     int currentCannon;
     int currentCannonFails;
     [SerializeField] GameObject cannonUI;
+
+    //pitfall variables
+    //a big 2d grid of dirt/stone, have to blow a continuous vertical path through
+    //int[,]: 0 is dirt, 1 is stone, negative is empty
+    int[,] terrain;
+    [SerializeField] GameObject pitFallUI;
+    [SerializeField] GameObject[] buttonGrid;
+    int bombs;
+
+    // medic variables
+    [SerializeField] List<int> ScenarioLineup;
+    [SerializeField] List<int> SolutionLineup;
     [SerializeField] GameObject medicUI;
-    #endregion
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -33,6 +46,10 @@ public class GameManager : MonoBehaviour
             FireCannons();
         } else if(action == "MedicSquad") {
             MedicSquad();
+        }
+        else if(action == "BlowPitfall")
+        {
+            BlowPitfall();
         }
 
         //disable the player buttons until their next turn
@@ -54,11 +71,11 @@ public class GameManager : MonoBehaviour
     }
     #region FireCannons
     //4 cannons fire, in a random order. Press them in the correct order
-    public void FireCannons()
+    private void FireCannons()
     {
         StartCoroutine(fire());
     }
-    public IEnumerator fire()
+    private IEnumerator fire()
     {
         //shuffle the inputs
         Shuffle(CannonFire);
@@ -101,7 +118,7 @@ public class GameManager : MonoBehaviour
             StartCoroutine(CheckCannons());
         }
     }
-    IEnumerator CheckCannons()
+    private IEnumerator CheckCannons()
     {
         cannonUI.transform.GetChild(5).GetComponent<Image>().color = Color.green;
         yield return new WaitForSeconds(.5f);
@@ -115,7 +132,6 @@ public class GameManager : MonoBehaviour
         EnemyTurn();
     }
     #endregion
-    //list shuffler
 
     #region MedicSquad
     public void MedicSquad() {
@@ -139,6 +155,139 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region BlowPitfall
+    private void BlowPitfall()
+    {
+        pitFallUI.SetActive(true);
+        bombs = 3;
+        terrain = new int[8,8];
+        List<Vector2Int> stored = new List<Vector2Int>();
+        //find 4 different positions
+        while(stored.Count < 4)
+        {
+            Vector2Int temp = new Vector2Int(Random.Range(1, 7), Random.Range(1, 7));
+            if(checkForDuplicate(temp, stored) == true)
+            {
+                continue;
+            }
+            stored.Add(temp);
+        }
+        //create a 3x3 rock in each position
+        for(int i = 0; i < stored.Count; ++i)
+        {
+            for(int j = -1; j < 2; ++j)
+            {
+                for(int k = -1; k < 2; ++k)
+                {
+                    try
+                    {
+                        terrain[stored[i].x + j, stored[i].y + k] = 1;
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+            //Debug.Log(stored[i].ToString());
+        }
+        //color button grid
+        for(int i = 0; i < 8; ++i)
+        {
+            //string o = "";
+            for(int j = 0; j < 8; ++j)
+            {
+                if(terrain[i, j] == 0)
+                {
+                    buttonGrid[i].transform.GetChild(j).GetComponent<Image>().color = new Color(193/255f, 106/255f, 19/255f);
+                }
+                else
+                {
+                    buttonGrid[i].transform.GetChild(j).GetComponent<Image>().color = Color.gray;
+                }
+                buttonGrid[i].transform.GetChild(j).name = i + "" + j;
+                //o += terrain[i, j] + " ";
+            }
+            //Debug.Log(o);
+        }
+    }
+    public void Explode()
+    {
+        Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+        bombs--;
+        Vector2Int temp = new Vector2Int(EventSystem.current.currentSelectedGameObject.name[0] - '0', EventSystem.current.currentSelectedGameObject.name[1] - '0');
+        Debug.Log(temp);
+
+        List<Vector2Int> visited = new List<Vector2Int>();
+        FloodExplode(temp, 3, visited);
+    }
+
+    private void FloodExplode(Vector2Int pos, int strength, List<Vector2Int> visisted)
+    {
+        try
+        {
+            Debug.Log(pos.ToString() + " " + strength + " " + terrain[pos.x, pos.y].ToString());
+        }
+        catch
+        {
+
+        }
+        int str = strength;
+        //if strength is 0 or negative, or pos outisde the map, return
+        if (str < 1 || pos.x < 0 || pos.x > 7 || pos.y < 0 || pos.y > 7 || checkForDuplicate(pos, visisted))
+        {
+            return;
+        }
+        //if stone and can blow through, break
+        else if (terrain[pos.x,pos.y] == 1 && str > 1)
+        {
+            Debug.Log("Stone to None");
+            terrain[pos.x, pos.y] = -1;
+            str--;
+            buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = Color.white;
+        }
+        //if stone but strength is 1, make into dirt
+        else if(terrain[pos.x,pos.y] == 1 && str == 1)
+        {
+            Debug.Log("Stone to Dirt");
+            terrain[pos.x, pos.y] = 0;
+            str--;
+            buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = new Color(193 / 255f, 106 / 255f, 19 / 255f);
+        }
+        //if dirt and strength 1 or more, break
+        else if (terrain[pos.x, pos.y] == 0 && str > 0)
+        {
+            Debug.Log("Dirt to None");
+            terrain[pos.x, pos.y] = -1;
+            buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = Color.white;
+        }
+        visisted.Add(pos);
+        str--;
+        //call down
+        if(str > 0)
+        {
+            FloodExplode(new Vector2Int(pos.x - 1, pos.y), str, visisted);
+            FloodExplode(new Vector2Int(pos.x + 1, pos.y), str, visisted);
+            FloodExplode(new Vector2Int(pos.x, pos.y - 1), str, visisted);
+            FloodExplode(new Vector2Int(pos.x, pos.y + 1), str, visisted);
+        }
+    }
+
+    //make sure the rocks don't spawn on each other
+    private bool checkForDuplicate(Vector2Int temp, List<Vector2Int> list)
+    {
+        foreach (Vector2Int v in list)
+        {
+            if(temp.x == v.x && temp.y == v.y)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    #endregion
+    //list shuffler
     static void Shuffle<T>(List<T> ts)
     {
         var count = ts.Count;
