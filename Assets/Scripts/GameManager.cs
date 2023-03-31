@@ -24,22 +24,32 @@ public class GameManager : MonoBehaviour
     int bombs;
 
     // medic variables
-    [SerializeField] List<int> ScenarioLineup;
-    [SerializeField] List<int> SolutionLineup;
-    [SerializeField] List<string> ScenarioOrder;
-    [SerializeField] List<string> SolutionOrder;
+    [SerializeField] List<int> sce_Lineup;
+    [SerializeField] List<int> sol_Lineup;
+    [SerializeField] List<MedicSquadTypes> ScenarioOrder;
+    [SerializeField] List<MedicSquadTypes> SolutionOrder;
     [SerializeField] GameObject medicUI;
     [SerializeField] List<bool> pairings;
-    [SerializeField] bool holdingButtonChoice;
-    [SerializeField] string choiceOpt;
+    // [SerializeField] bool holdingButtonChoice;
+    // [SerializeField] string choiceOpt;
+
+    public enum MedicSquadTypes {
+        FRACTURES = 1,
+        BURNS = 2,
+        DEAD = 3,
+        OUTOFAMMO = 4,
+        PLASTER = -1,
+        SPLINTS = -2,
+        REINFORCEMENTS = -3,
+        RESUPPLY = -4
+    }
+
 
     // Start is called before the first frame update
     void Start() {
         pairings.Clear();
-        holdingButtonChoice = false;
         ScenarioOrder.Clear();
         SolutionOrder.Clear();
-        choiceOpt = "";
     }
 
     // Update is called once per frame
@@ -147,63 +157,57 @@ public class GameManager : MonoBehaviour
     }
 
     public IEnumerator organize() {
-        Shuffle(ScenarioLineup);
-        Shuffle(SolutionLineup);
+        // changes the order of the input and output buttons and assigning them the positions
+        Shuffle(sce_Lineup);
+        Shuffle(sol_Lineup);
 
         // 0: scenarios, 1: solutions, 2: scenario positions, 3: solution positions
-        for(int i = 0; i < ScenarioLineup.Count; i++) {
-            medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).position = medicUI.transform.GetChild(2).GetChild(i).position;
-            ScenarioOrder.Add(medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).name);
-            // medicUI.transform.GetChild(0).GetChild(ScenarioLineup[i]).GetComponent<SquadChoice>().indexOfChoice = i;
+        for(int i = 1; i < sce_Lineup.Count + 1; i++) {
+            medicUI.transform.GetChild(0).GetChild(sce_Lineup[i]).position = medicUI.transform.GetChild(2).GetChild(i).position;
+            ScenarioOrder.Add((MedicSquadTypes)i);
 
-            medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).position = medicUI.transform.GetChild(3).GetChild(i).position;
-            SolutionOrder.Add(medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).name);
-            // medicUI.transform.GetChild(1).GetChild(SolutionLineup[i]).GetComponent<SquadChoice>().indexOfChoice = i;
+            medicUI.transform.GetChild(1).GetChild(sol_Lineup[i]).position = medicUI.transform.GetChild(3).GetChild(i).position;
+            SolutionOrder.Add((MedicSquadTypes)(i*(-1)));
             
         }
 
         medicUI.transform.gameObject.SetActive(true);
         
-        yield return new WaitForSeconds(20.0f);
+        yield return new WaitForSeconds(60.0f);
         medicUI.transform.gameObject.SetActive(false);
         EnemyTurn();
     }
 
     // type = 0 -> scenario, type = 1 -> solution
-    public void GrabButtonInput(string choice) {
-        if(holdingButtonChoice) {
-            if(ScenarioOrder.Contains(choice)) {    // it is a scenario obj
-                if(ScenarioOrder.Contains(choiceOpt)) {     // if we are choosing a button that is in the same row
-                    choiceOpt = choice;
-                } else {    // both the one we are holding and the new one receiving are different types, continue on
-                    ComparePairings(ScenarioOrder.IndexOf(choice), SolutionOrder.IndexOf(choiceOpt));
-                }
-            } else if(SolutionOrder.Contains(choice)) {     // it is a solution obj
-                if(SolutionOrder.Contains(choiceOpt)) {     // if we are choosing button that's in same row, swap
-                    choiceOpt = choice;
-                } else {        // both choices are different, we compare
-                    ComparePairings(ScenarioOrder.IndexOf(choiceOpt), SolutionOrder.IndexOf(choice));
-                }
+    public void GrabInput(int typ) {
+        MedicSquadTypes index = (MedicSquadTypes)typ;
+        // if(holdingButtonChoice) {
+        //     if(ScenarioOrder.Contains(choice)) {    // it is a scenario obj
+        //         if(ScenarioOrder.Contains(choiceOpt)) {     // if we are choosing a button that is in the same row
+        //             choiceOpt = choice;
+        //         } else {    // both the one we are holding and the new one receiving are different types, continue on
+        //             ComparePairings(ScenarioOrder.IndexOf(choice), SolutionOrder.IndexOf(choiceOpt));
+        //         }
+        //     } else if(SolutionOrder.Contains(choice)) {     // it is a solution obj
+        //         if(SolutionOrder.Contains(choiceOpt)) {     // if we are choosing button that's in same row, swap
+        //             choiceOpt = choice;
+        //         } else {        // both choices are different, we compare
+        //             ComparePairings(ScenarioOrder.IndexOf(choiceOpt), SolutionOrder.IndexOf(choice));
+        //         }
 
-            } else {    // something messed up?
-                Debug.Log("BAD ERROR??");
-            }
+        //     } else {    // something messed up?
+        //         Debug.Log("BAD ERROR??");
+        //     }
 
 
-        } else if(!holdingButtonChoice) {
-            holdingButtonChoice = true;    // if they are not holding a choice yet, they are now :)
-            choiceOpt = choice;
-        }
+        // } else if(!holdingButtonChoice) {
+        //     holdingButtonChoice = true;    // if they are not holding a choice yet, they are now :)
+        //     choiceOpt = choice;
+        // }
 
     }
 
-    public void ComparePairings(int sc_index, int so_index) {
-        if(ScenarioLineup[sc_index] == SolutionLineup[so_index]) { pairings.Add(true); }
-        else { pairings.Add(false); }
-        ScenarioLineup.RemoveAt(sc_index);
-        SolutionLineup.RemoveAt(so_index);
-        holdingButtonChoice = false;        // empties out the object list
-    }
+
 
     #endregion
 

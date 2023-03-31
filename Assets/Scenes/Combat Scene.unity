@@ -913,7 +913,7 @@ GameObject:
   - component: {fileID: 172860893}
   - component: {fileID: 172860895}
   m_Layer: 5
-  m_Name: s-Ammo
+  m_Name: s-Burns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1884,8 +1884,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: GrabInput
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5282,14 +5282,12 @@ MonoBehaviour:
   - {fileID: 722580548}
   - {fileID: 472905276}
   - {fileID: 600716570}
-  ScenarioLineup: 00000000010000000200000003000000
-  SolutionLineup: 00000000010000000200000003000000
-  ScenarioOrder: []
-  SolutionOrder: []
+  sce_Lineup: 
+  sol_Lineup: 
+  ScenarioOrder: 
+  SolutionOrder: 
   medicUI: {fileID: 513367215}
   pairings: 
-  holdingButtonChoice: 0
-  choiceOpt: 
 --- !u!4 &704049921
 Transform:
   m_ObjectHideFlags: 0
