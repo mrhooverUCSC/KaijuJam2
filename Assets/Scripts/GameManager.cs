@@ -238,10 +238,7 @@ public class GameManager : MonoBehaviour
                     {
                         terrain[stored[i].x + j, stored[i].y + k] = 1;
                     }
-                    catch
-                    {
-
-                    }
+                    catch{}
                 }
             }
             //Debug.Log(stored[i].ToString());
@@ -275,6 +272,10 @@ public class GameManager : MonoBehaviour
 
         List<Vector2Int> visited = new List<Vector2Int>();
         FloodExplode(temp, 3, visited);
+        if(bombs == 0)
+        {
+            CheckHole();
+        }
     }
 
     private void FloodExplode(Vector2Int pos, int strength, List<Vector2Int> visisted)
@@ -282,11 +283,7 @@ public class GameManager : MonoBehaviour
         try
         {
             Debug.Log(pos.ToString() + " " + strength + " " + terrain[pos.x, pos.y].ToString());
-        }
-        catch
-        {
-
-        }
+        }catch{}
         int str = strength;
         //if strength is 0 or negative, or pos outisde the map, return
         if (str < 1 || pos.x < 0 || pos.x > 7 || pos.y < 0 || pos.y > 7 || checkForDuplicate(pos, visisted))
@@ -327,6 +324,64 @@ public class GameManager : MonoBehaviour
             FloodExplode(new Vector2Int(pos.x, pos.y + 1), str, visisted);
         }
     }
+
+    private void CheckHole()
+    {
+        if (HelperCheckHole())
+        {
+            Debug.Log("path found");
+        }
+    }
+
+    private bool HelperCheckHole()
+    {
+        for (int i = 0; i < 8; ++i)
+        {
+            if (terrain[0, i] == -1)
+            {
+                Debug.Log("empty on top row found: " + i);
+                List<Vector2Int> visited = new List<Vector2Int>();
+                if (FloodCheckHole(visited, new Vector2Int(0, i)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private bool FloodCheckHole(List<Vector2Int> visited, Vector2Int pos)
+    {
+        //if on the bottom row, return true: made it top to bottom
+        if(pos.x == 7 && terrain[pos.x, pos.y] < 0)
+        {
+            return true;
+        }
+        //if out of bounds, return false
+        if(pos.x < 0 || pos.x > 7 || pos.y < 0 || pos.y > 7)
+        {
+            return false;
+        }
+        //if not empty, return false
+        if(terrain[pos.x, pos.y] >= 0)
+        {
+            return false;
+        }
+        //if already been here, return false
+        if(checkForDuplicate(pos, visited))
+        {
+            return false;
+        }
+
+        visited.Add(pos);
+        //if a true is found anywhere below, return true
+        if(FloodCheckHole(visited, new Vector2Int(pos.x - 1, pos.y)) || FloodCheckHole(visited, new Vector2Int(pos.x + 1, pos.y)) || FloodCheckHole(visited, new Vector2Int(pos.x, pos.y - 1)) || FloodCheckHole(visited, new Vector2Int(pos.x, pos.y + 1))){
+            return true;
+        }
+
+        //if not any of those cases, return false
+        return false;
+    }
+
 
     //make sure the rocks don't spawn on each other
     private bool checkForDuplicate(Vector2Int temp, List<Vector2Int> list)
