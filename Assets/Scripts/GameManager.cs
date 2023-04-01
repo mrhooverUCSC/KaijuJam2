@@ -29,27 +29,30 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<MedicSquadTypes> ScenarioOrder;
     [SerializeField] List<MedicSquadTypes> SolutionOrder;
     [SerializeField] GameObject medicUI;
-    [SerializeField] List<bool> pairings;
-    // [SerializeField] bool holdingButtonChoice;
-    // [SerializeField] string choiceOpt;
-
+    // [SerializeField] List<bool> pairings;
+    [SerializeField] public Dictionary<MedicSquadTypes, GameObject> button_Pairing;
+    public int MedicSquadCorrectPairings;   // stores # of pairings player got correct
+    public int MedicSquadAmountPaired;  // stores # of pairings player has done
+    public int MedicSquadNumberOfPairings;  // stores overall # of pairings total
     public enum MedicSquadTypes {
-        FRACTURES = 1,
-        BURNS = 2,
-        DEAD = 3,
-        OUTOFAMMO = 4,
-        PLASTER = -1,
-        SPLINTS = -2,
-        REINFORCEMENTS = -3,
-        RESUPPLY = -4
+        FRACTURES = -1,
+        BURNS = -2,
+        DEAD = -3,
+        OUTOFAMMO = -4,
+        // ^ SCENARIOS ARE ABOVE (OUTPUT), v SOLUTIONS ARE BELOW (INPUT)
+        PLASTER = 1,
+        SPLINTS = 2,
+        REINFORCEMENTS = 3,
+        RESUPPLY = 4
     }
-
+    public int ms_ButtonInput;   // stores Medic Squad button input of game object
 
     // Start is called before the first frame update
     void Start() {
-        pairings.Clear();
+        button_Pairing = new Dictionary<MedicSquadTypes, GameObject>();
         ScenarioOrder.Clear();
         SolutionOrder.Clear();
+        ms_ButtonInput = 0;
     }
 
     // Update is called once per frame
@@ -156,61 +159,83 @@ public class GameManager : MonoBehaviour
     #region MedicSquad
     // i am sorry for fucking up this code -Ivan
     public void MedicSquad() {
-        StartCoroutine(organize());
+        button_Pairing.Clear();
+        MedicSquadCorrectPairings = 0;
+        MedicSquadAmountPaired = 0;
+        MedicOrganize();
     }
 
-    public IEnumerator organize() {
+    public void MedicOrganize() {
         // changes the order of the input and output buttons and assigning them the positions
         Shuffle(sce_Lineup);
         Shuffle(sol_Lineup);
 
         // 0: scenarios, 1: solutions, 2: scenario positions, 3: solution positions
-        for(int i = 1; i < sce_Lineup.Count + 1; i++) {
-            medicUI.transform.GetChild(0).GetChild(sce_Lineup[i]).position = medicUI.transform.GetChild(2).GetChild(i).position;
-            ScenarioOrder.Add((MedicSquadTypes)i);
+        for(int i = 0; i < sce_Lineup.Count; i++) {
+            int sce_index = sce_Lineup[i];  // stores scenario index for positioning sake
+            int sol_index = sol_Lineup[i];  // stores solution index for positioning sake
 
-            medicUI.transform.GetChild(1).GetChild(sol_Lineup[i]).position = medicUI.transform.GetChild(3).GetChild(i).position;
-            SolutionOrder.Add((MedicSquadTypes)(i*(-1)));
+            int sce_val = (sce_Lineup[i] + 1) * (-1);    // stores value assigned to MST
+            int sol_val = sol_Lineup[i] + 1;
+
+            medicUI.transform.GetChild(0).GetChild(sce_index).gameObject.SetActive(true);
+            medicUI.transform.GetChild(0).GetChild(sce_index).GetComponent<Button>().interactable = true;
+            medicUI.transform.GetChild(0).GetChild(sce_index).position = medicUI.transform.GetChild(2).GetChild(i).position;
+            button_Pairing.Add((MedicSquadTypes)sce_val, medicUI.transform.GetChild(0).GetChild(sce_index).gameObject);
+
+            medicUI.transform.GetChild(1).GetChild(sol_index).gameObject.SetActive(true);
+            medicUI.transform.GetChild(1).GetChild(sol_index).GetComponent<Button>().interactable = true;
+            medicUI.transform.GetChild(1).GetChild(sol_index).position = medicUI.transform.GetChild(3).GetChild(i).position;
+            button_Pairing.Add((MedicSquadTypes)sol_val, medicUI.transform.GetChild(1).GetChild(sol_index).gameObject);
             
         }
 
         medicUI.transform.gameObject.SetActive(true);
-        
-        yield return new WaitForSeconds(60.0f);
+        MedicSquadNumberOfPairings = sce_Lineup.Count;   // stores how many pairs there are
+
+    }
+
+    public void MedicClose() {
+        Debug.Log("Received a score of: " + MedicSquadCorrectPairings + "/" + MedicSquadNumberOfPairings);
         medicUI.transform.gameObject.SetActive(false);
         EnemyTurn();
     }
 
-    // type = 0 -> scenario, type = 1 -> solution
-    public void GrabInput(int typ) {
-        MedicSquadTypes index = (MedicSquadTypes)typ;
-        // if(holdingButtonChoice) {
-        //     if(ScenarioOrder.Contains(choice)) {    // it is a scenario obj
-        //         if(ScenarioOrder.Contains(choiceOpt)) {     // if we are choosing a button that is in the same row
-        //             choiceOpt = choice;
-        //         } else {    // both the one we are holding and the new one receiving are different types, continue on
-        //             ComparePairings(ScenarioOrder.IndexOf(choice), SolutionOrder.IndexOf(choiceOpt));
-        //         }
-        //     } else if(SolutionOrder.Contains(choice)) {     // it is a solution obj
-        //         if(SolutionOrder.Contains(choiceOpt)) {     // if we are choosing button that's in same row, swap
-        //             choiceOpt = choice;
-        //         } else {        // both choices are different, we compare
-        //             ComparePairings(ScenarioOrder.IndexOf(choiceOpt), SolutionOrder.IndexOf(choice));
-        //         }
-
-        //     } else {    // something messed up?
-        //         Debug.Log("BAD ERROR??");
-        //     }
-
-
-        // } else if(!holdingButtonChoice) {
-        //     holdingButtonChoice = true;    // if they are not holding a choice yet, they are now :)
-        //     choiceOpt = choice;
-        // }
-
+    // Medic Squad Input Button Function (value will be )
+    public void GrabInput(int inp) {
+        Debug.Log("Clicked on " + inp);
+        ms_ButtonInput = inp;
     }
 
+    // Medic Squad Output Button Function
+    public void ComparePairings(int ms_ButtonOutput) {
+        Debug.Log("Clicked on " + ms_ButtonOutput);
+        // if the minigame has not received an input from a player
+        if(ms_ButtonInput <= 0 || ms_ButtonInput > 4) { 
+            Debug.Log("nothing has been stored yet");
+            return;
+        }
 
+        if(ms_ButtonInput == (ms_ButtonOutput * (-1))) {
+            Debug.Log("These are the same");
+            MedicSquadCorrectPairings++;
+        }
+        else {
+            Debug.Log("WRONG: " + ms_ButtonOutput + " and " + ms_ButtonInput + " arent the samee");
+        }
+
+        button_Pairing[(MedicSquadTypes)ms_ButtonInput].transform.GetComponent<Button>().interactable = false;
+        button_Pairing[(MedicSquadTypes)ms_ButtonOutput].transform.GetComponent<Button>().interactable = false;
+
+        ms_ButtonInput = 0;
+        MedicSquadAmountPaired++;
+
+        // Moves onto enemy turn once it reaches the last button pairing attempt
+        if(MedicSquadAmountPaired >= MedicSquadNumberOfPairings) {
+            MedicClose();
+        }
+
+    }
 
     #endregion
 

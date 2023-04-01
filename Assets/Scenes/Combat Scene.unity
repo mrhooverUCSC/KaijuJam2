@@ -959,7 +959,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dig Pits
+  m_text: Burns
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1082,14 +1082,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: ComparePairings
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: -2
           m_FloatArgument: 0
-          m_StringArgument: s-Ammo
+          m_StringArgument: 2
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &177195269
@@ -1884,12 +1884,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabInput
+        m_MethodName: ComparePairings
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: -1
           m_FloatArgument: 0
           m_StringArgument: s-Fractures
           m_BoolArgument: 0
@@ -2827,12 +2827,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: ComparePairings
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: -3
           m_FloatArgument: 0
           m_StringArgument: s-Dead
           m_BoolArgument: 0
@@ -3126,14 +3126,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: GrabInput
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
-          m_StringArgument: s-Reinforcements
+          m_StringArgument: -3
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &411455231
@@ -3318,12 +3318,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: ComparePairings
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: -4
           m_FloatArgument: 0
           m_StringArgument: s-OutOfAmmo
           m_BoolArgument: 0
@@ -3549,14 +3549,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: GrabInput
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 4
           m_FloatArgument: 0
-          m_StringArgument: s-Resupply
+          m_StringArgument: -4
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &472905276
@@ -4283,7 +4283,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &513367216
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5282,12 +5282,13 @@ MonoBehaviour:
   - {fileID: 722580548}
   - {fileID: 472905276}
   - {fileID: 600716570}
-  sce_Lineup: 
-  sol_Lineup: 
+  sce_Lineup: 00000000010000000200000003000000
+  sol_Lineup: 00000000010000000200000003000000
   ScenarioOrder: 
   SolutionOrder: 
   medicUI: {fileID: 513367215}
-  pairings: 
+  MedicSquadCorrectPairings: 0
+  ms_ButtonInput: 0
 --- !u!4 &704049921
 Transform:
   m_ObjectHideFlags: 0
@@ -8428,14 +8429,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: GrabInput
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
-          m_StringArgument: s-Splints
+          m_StringArgument: -2
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &1137255766
@@ -12999,14 +13000,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 704049920}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: GrabButtonInput
-        m_Mode: 5
+        m_MethodName: GrabInput
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
-          m_StringArgument: s-Plaster
+          m_StringArgument: -1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!1 &1959897567
