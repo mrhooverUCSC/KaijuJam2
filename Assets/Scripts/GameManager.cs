@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] Button[] playerActionButtons;
+    [SerializeField] Crab crab;
+    [SerializeField] int playerHealth = 50;
+    [SerializeField] TextMeshProUGUI playerHealthText;
 
     //cannon variables
-    [SerializeField] List<int> CannonFire;
+    List<int> CannonFire = new List<int> { 0,1,2,3,4 };
     int currentCannon;
     int currentCannonFails;
     [SerializeField] GameObject cannonUI;
+    int maxCannonDamage = 5;
 
     //pitfall variables
     //a big 2d grid of dirt/stone, have to blow a continuous vertical path through
@@ -23,7 +28,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject[] buttonGrid;
     int bombs;
 
-    // medic variables
+    [Header("Medic Variables")]     // medic variables
     [SerializeField] List<int> sce_Lineup;
     [SerializeField] List<int> sol_Lineup;
     [SerializeField] List<MedicSquadTypes> ScenarioOrder;
@@ -78,17 +83,19 @@ public class GameManager : MonoBehaviour
             b.interactable = false;
         }
     }
-    void EnemyTurn()
-    {
-        ReadyPlayerTurn();
-    }
-    void ReadyPlayerTurn()
+    public void ReadyPlayerTurn()
     {
         foreach (Button b in playerActionButtons)
         {
             b.interactable = true;
         }
     }
+    public void DamagePlayer(int dmg)
+    {
+        playerHealth -= dmg;
+        playerHealthText.text = playerHealth.ToString();
+    }
+
     #region FireCannons
     //4 cannons fire, in a random order. Press them in the correct order
     private void FireCannons()
@@ -101,6 +108,7 @@ public class GameManager : MonoBehaviour
         //shuffle the inputs
         Shuffle(CannonFire);
         currentCannon = 0;
+        currentCannonFails = 0;
         //turn them on in order
         yield return new WaitForSeconds(.5f);
         cannonUI.transform.GetChild(CannonFire[0]).gameObject.SetActive(true);
@@ -148,9 +156,9 @@ public class GameManager : MonoBehaviour
         {
             cannonUI.transform.GetChild(i).gameObject.SetActive(false);
         }
-        //deal damage
+        crab.TakeDamage(maxCannonDamage - currentCannonFails);
         yield return new WaitForSeconds(.5f);
-        EnemyTurn();
+        crab.EnemyTurn(this);
         //CinematicCameraManager.instance.ChangeCameraMode(CinematicCameraManager.CameraMode.DYNAMIC);
         //CinematicCameraManager.instance.Reset();
     }
@@ -178,15 +186,15 @@ public class GameManager : MonoBehaviour
             int sce_val = (sce_Lineup[i] + 1) * (-1);    // stores value assigned to MST
             int sol_val = sol_Lineup[i] + 1;
 
-            medicUI.transform.GetChild(0).GetChild(sce_index).gameObject.SetActive(true);
-            medicUI.transform.GetChild(0).GetChild(sce_index).GetComponent<Button>().interactable = true;
-            medicUI.transform.GetChild(0).GetChild(sce_index).position = medicUI.transform.GetChild(2).GetChild(i).position;
-            button_Pairing.Add((MedicSquadTypes)sce_val, medicUI.transform.GetChild(0).GetChild(sce_index).gameObject);
+            medicUI.transform.GetChild(1).GetChild(sce_index).gameObject.SetActive(true);
+            medicUI.transform.GetChild(1).GetChild(sce_index).GetComponent<Button>().interactable = true;
+            medicUI.transform.GetChild(1).GetChild(sce_index).position = medicUI.transform.GetChild(3).GetChild(i).position;
+            button_Pairing.Add((MedicSquadTypes)sce_val, medicUI.transform.GetChild(1).GetChild(sce_index).gameObject);
 
-            medicUI.transform.GetChild(1).GetChild(sol_index).gameObject.SetActive(true);
-            medicUI.transform.GetChild(1).GetChild(sol_index).GetComponent<Button>().interactable = true;
-            medicUI.transform.GetChild(1).GetChild(sol_index).position = medicUI.transform.GetChild(3).GetChild(i).position;
-            button_Pairing.Add((MedicSquadTypes)sol_val, medicUI.transform.GetChild(1).GetChild(sol_index).gameObject);
+            medicUI.transform.GetChild(2).GetChild(sol_index).gameObject.SetActive(true);
+            medicUI.transform.GetChild(2).GetChild(sol_index).GetComponent<Button>().interactable = true;
+            medicUI.transform.GetChild(2).GetChild(sol_index).position = medicUI.transform.GetChild(4).GetChild(i).position;
+            button_Pairing.Add((MedicSquadTypes)sol_val, medicUI.transform.GetChild(2).GetChild(sol_index).gameObject);
             
         }
 
@@ -197,8 +205,10 @@ public class GameManager : MonoBehaviour
 
     public void MedicClose() {
         Debug.Log("Received a score of: " + MedicSquadCorrectPairings + "/" + MedicSquadNumberOfPairings);
+        Debug.Log(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
+        DamagePlayer(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
         medicUI.transform.gameObject.SetActive(false);
-        EnemyTurn();
+        crab.EnemyTurn(this);
     }
 
     // Medic Squad Input Button Function (value will be )
