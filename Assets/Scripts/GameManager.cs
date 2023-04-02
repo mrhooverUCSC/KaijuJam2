@@ -369,7 +369,10 @@ public class GameManager : MonoBehaviour
         if (HelperCheckHole())
         {
             Debug.Log("path found");
+            crab.AddPitfall();
         }
+        pitFallUI.SetActive(false);
+        crab.EnemyTurn(this);
     }
 
     private bool HelperCheckHole()
@@ -378,7 +381,7 @@ public class GameManager : MonoBehaviour
         {
             if (terrain[0, i] == -1)
             {
-                Debug.Log("empty on top row found: " + i);
+                //Debug.Log("empty on top row found: " + i);
                 List<Vector2Int> visited = new List<Vector2Int>();
                 if (FloodCheckHole(visited, new Vector2Int(0, i)))
                 {
@@ -420,7 +423,6 @@ public class GameManager : MonoBehaviour
         //if not any of those cases, return false
         return false;
     }
-
 
     //make sure the rocks don't spawn on each other
     private bool checkForDuplicate(Vector2Int temp, List<Vector2Int> list)
