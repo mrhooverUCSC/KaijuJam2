@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator fire()
     {
-        //CinematicCameraManager.instance.CameraStaticFocus(playerFocusObj);
+        CinematicCameraManager.instance.StartPlayerFocus(6f); //TALK TO MATT, THIS IS TEMP
         //shuffle the inputs
         Shuffle(CannonFire);
         currentCannon = 0;

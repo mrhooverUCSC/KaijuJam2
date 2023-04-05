@@ -15,6 +15,7 @@ public class CinematicCameraManager : MonoBehaviour
     [SerializeField] CinemachineSmoothPath startPath;
     [SerializeField] CinemachineSmoothPath[] paths;
 
+    [SerializeField] Transform playerFocusObj;
     [SerializeField] CinemachineSmoothPath playerFocusPath;
 
 
@@ -84,18 +85,24 @@ public class CinematicCameraManager : MonoBehaviour
         StartCoroutine(ChangeTrack());
     }
 
-    IEnumerator PlayerFocus()
+    IEnumerator PlayerFocus(float seconds)
     {
+        virtualCamera.LookAt = playerFocusObj;
         var path = playerFocusPath;
         cart.m_Path = path;
         StartCoroutine(ChangeTrack());
-        yield return new WaitForSeconds(3f); //TODO: TALK TO MATT, THIS IS JUST TEMPORARY
+        yield return new WaitForSeconds(seconds); //TODO: TALK TO MATT, THIS IS JUST TEMPORARY
+        virtualCamera.LookAt = sceneCenter;
     }
 
+
+    public void StartPlayerFocus(float seconds)
+    {
+        StartCoroutine(PlayerFocus(seconds));
+    }
     public void CameraStaticFocus(Transform focusObj)
     {
         StopAllCoroutines();
-
 
     }
 
