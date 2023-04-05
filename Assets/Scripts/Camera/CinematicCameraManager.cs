@@ -15,6 +15,8 @@ public class CinematicCameraManager : MonoBehaviour
     [SerializeField] CinemachineSmoothPath startPath;
     [SerializeField] CinemachineSmoothPath[] paths;
 
+    [SerializeField] CinemachineSmoothPath playerFocusPath;
+
 
     [SerializeField] Transform sceneCenter; //An empty game object placed at the center of the scene, this is where the camera will focus on during the "move selection" phase of the player's turn
 
@@ -80,6 +82,14 @@ public class CinematicCameraManager : MonoBehaviour
         cart.m_Path = path;
 
         StartCoroutine(ChangeTrack());
+    }
+
+    IEnumerator PlayerFocus()
+    {
+        var path = playerFocusPath;
+        cart.m_Path = path;
+        StartCoroutine(ChangeTrack());
+        yield return new WaitForSeconds(3f); //TODO: TALK TO MATT, THIS IS JUST TEMPORARY
     }
 
     public void CameraStaticFocus(Transform focusObj)

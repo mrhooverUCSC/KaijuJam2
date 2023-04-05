@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class Billboard : MonoBehaviour
 {
-
-    // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
-        transform.LookAt(Camera.main.transform.position, Vector3.down);
+        transform.LookAt(Camera.main.transform);
     }
 }
