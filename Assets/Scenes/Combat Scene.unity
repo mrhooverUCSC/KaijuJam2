@@ -1621,6 +1621,7 @@ GameObject:
   - component: {fileID: 233184055}
   - component: {fileID: 233184054}
   - component: {fileID: 233184053}
+  - component: {fileID: 233184056}
   m_Layer: 0
   m_Name: Square (3)
   m_TagString: Untagged
@@ -1715,6 +1716,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &233184056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233184052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d63cc40459c01645b24d6e0b5d27e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &265183121
 GameObject:
   m_ObjectHideFlags: 0
@@ -7555,6 +7568,7 @@ GameObject:
   - component: {fileID: 961974317}
   - component: {fileID: 961974316}
   - component: {fileID: 961974315}
+  - component: {fileID: 961974318}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -7649,6 +7663,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &961974318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961974314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d63cc40459c01645b24d6e0b5d27e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &966101112
 GameObject:
   m_ObjectHideFlags: 0
@@ -8101,6 +8127,7 @@ GameObject:
   - component: {fileID: 987685769}
   - component: {fileID: 987685768}
   - component: {fileID: 987685767}
+  - component: {fileID: 987685770}
   m_Layer: 0
   m_Name: Square (1)
   m_TagString: Untagged
@@ -8195,6 +8222,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &987685770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987685766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d63cc40459c01645b24d6e0b5d27e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &992750019
 GameObject:
   m_ObjectHideFlags: 0
@@ -9630,7 +9669,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -12270,7 +12309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f39b47b98930224e955865de73faace, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 50
+  health: 2
   healthText: {fileID: 2123203022}
   distance: 1000
   distanceText: {fileID: 767790871}
@@ -12554,6 +12593,7 @@ GameObject:
   - component: {fileID: 1638590071}
   - component: {fileID: 1638590070}
   - component: {fileID: 1638590069}
+  - component: {fileID: 1638590072}
   m_Layer: 0
   m_Name: Square (2)
   m_TagString: Untagged
@@ -12648,6 +12688,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1638590072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1638590068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d63cc40459c01645b24d6e0b5d27e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1641634612
 GameObject:
   m_ObjectHideFlags: 0
