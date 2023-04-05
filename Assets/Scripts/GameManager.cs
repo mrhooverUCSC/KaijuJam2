@@ -12,6 +12,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] Crab crab;
     [SerializeField] int playerHealth = 50;
     [SerializeField] TextMeshProUGUI playerHealthText;
+    [SerializeField] GameObject failureInterface;
+    [SerializeField] GameObject successInterface;
+    //unused game state
+    public enum GameState
+    {
+        GO,
+        END
+    }
+    GameState currentGameState = GameState.GO;
 
     //cannon variables
     List<int> CannonFire = new List<int> { 0,1,2,3,4 };
@@ -54,6 +63,7 @@ public class GameManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
+        crab.AttachToCrab(this);
         button_Pairing = new Dictionary<MedicSquadTypes, GameObject>();
         ScenarioOrder.Clear();
         SolutionOrder.Clear();
@@ -94,7 +104,37 @@ public class GameManager : MonoBehaviour
     {
         playerHealth -= dmg;
         playerHealthText.text = playerHealth.ToString();
+        if(playerHealth <= 0)
+        {
+            Debug.Log("player died");
+            Failure();
+        }
     }
+
+    #region Endings
+    public void Failure()
+    {
+        //disable the player buttons
+        foreach (Button b in playerActionButtons)
+        {
+            b.interactable = false;
+        }
+        failureInterface.SetActive(true);
+    }
+    public void Success()
+    {
+        //disable the player buttons
+        foreach (Button b in playerActionButtons)
+        {
+            b.interactable = false;
+        }
+        successInterface.SetActive(true);
+    }
+    public void LoadTitle()
+    {
+        TitleManager.Instance.EnterTitle();
+    }
+    #endregion
 
     #region FireCannons
     //4 cannons fire, in a random order. Press them in the correct order
@@ -158,7 +198,7 @@ public class GameManager : MonoBehaviour
         }
         crab.TakeDamage(maxCannonDamage - currentCannonFails);
         yield return new WaitForSeconds(.5f);
-        crab.EnemyTurn(this);
+        crab.EnemyTurn();
         //CinematicCameraManager.instance.ChangeCameraMode(CinematicCameraManager.CameraMode.DYNAMIC);
         //CinematicCameraManager.instance.Reset();
     }
@@ -208,7 +248,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
         DamagePlayer(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
         medicUI.transform.gameObject.SetActive(false);
-        crab.EnemyTurn(this);
+        crab.EnemyTurn();
     }
 
     // Medic Squad Input Button Function (value will be )
@@ -304,10 +344,10 @@ public class GameManager : MonoBehaviour
     }
     public void Explode()
     {
-        Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+        //Debug.Log(EventSystem.current.currentSelectedGameObject.name);
         bombs--;
         Vector2Int temp = new Vector2Int(EventSystem.current.currentSelectedGameObject.name[0] - '0', EventSystem.current.currentSelectedGameObject.name[1] - '0');
-        Debug.Log(temp);
+        //Debug.Log(temp);
 
         List<Vector2Int> visited = new List<Vector2Int>();
         FloodExplode(temp, 3, visited);
@@ -368,11 +408,11 @@ public class GameManager : MonoBehaviour
     {
         if (HelperCheckHole())
         {
-            Debug.Log("path found");
+            //Debug.Log("path found");
             crab.AddPitfall();
         }
         pitFallUI.SetActive(false);
-        crab.EnemyTurn(this);
+        crab.EnemyTurn();
     }
 
     private bool HelperCheckHole()
@@ -438,6 +478,7 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
     //list shuffler
     static void Shuffle<T>(List<T> ts)
     {
@@ -451,5 +492,7 @@ public class GameManager : MonoBehaviour
             ts[r] = tmp;
         }
     }
+
+
 
 }

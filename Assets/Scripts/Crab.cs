@@ -10,6 +10,7 @@ public class Crab : MonoBehaviour
     [SerializeField] int distance;
     [SerializeField] TextMeshProUGUI distanceText;
     [SerializeField] TextMeshProUGUI pitfallText;
+    [SerializeField] GameManager gm;
     public int pitfalls = 0;
     // Start is called before the first frame update
     void Start()
@@ -24,6 +25,10 @@ public class Crab : MonoBehaviour
         
     }
 
+    public void AttachToCrab(GameManager g)
+    {
+        gm = g;
+    }
     public void TakeDamage(int dmg)
     {
         health -= dmg;
@@ -31,6 +36,7 @@ public class Crab : MonoBehaviour
         if (health <= 0)
         {
             Debug.Log("Crab Defeated");
+            gm.Success();
         }
     }
 
@@ -41,6 +47,7 @@ public class Crab : MonoBehaviour
         if(distance <= 0)
         {
             Debug.Log("Game Lost");
+            gm.Failure();
         }
     }
 
@@ -50,7 +57,7 @@ public class Crab : MonoBehaviour
         pitfallText.text = pitfalls + "Pitfalls";
     }
 
-    public void EnemyTurn(GameManager gm)
+    public void EnemyTurn()
     {
         int temp = (int)Random.Range(0, 2);
         Debug.Log(temp);

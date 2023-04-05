@@ -35,5 +35,11 @@ public class TitleManager : MonoBehaviour
         Debug.Log("entering combat");
         SceneManager.LoadScene("Combat Scene");
     }
+
+    public void EnterTitle()
+    {
+        Debug.Log("entering combat");
+        SceneManager.LoadScene("Title Scene");
+    }
     #endregion
 }
