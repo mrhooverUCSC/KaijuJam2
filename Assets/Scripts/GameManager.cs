@@ -102,6 +102,10 @@ public class GameManager : MonoBehaviour
     public void DamagePlayer(int dmg)
     {
         playerHealth -= dmg;
+        if(playerHealth >= 50)
+        {
+            playerHealth = 50;
+        }
         playerHealthText.text = playerHealth.ToString();
         if(playerHealth <= 0)
         {
