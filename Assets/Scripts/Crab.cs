@@ -11,6 +11,10 @@ public class Crab : MonoBehaviour
     [SerializeField] TextMeshProUGUI distanceText;
     [SerializeField] TextMeshProUGUI pitfallText;
     [SerializeField] GameManager gm;
+    [SerializeField] GameObject startPosition;
+    [SerializeField] GameObject endPosition;
+    Vector3 targetPosition;
+    bool crabTurn = false;
     public int pitfalls = 0;
     // Start is called before the first frame update
     void Start()
@@ -22,7 +26,15 @@ public class Crab : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(crabTurn && targetPosition != null && Vector3.Distance(targetPosition, transform.position) > .5)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, .1f);
+        }
+        else if (crabTurn && targetPosition != null && Vector3.Distance(targetPosition, transform.position) <= .5)
+        {
+            crabTurn = false;
+            gm.ReadyPlayerTurn();
+        }
     }
 
     public void AttachToCrab(GameManager g)
@@ -44,11 +56,17 @@ public class Crab : MonoBehaviour
     {
         distance -= dis;
         distanceText.text = distance + " meters";
-        if(distance <= 0)
+        Debug.Log(distance);
+        float percentThere = (1.0f - distance / 1000.0f);
+        print(percentThere);
+        targetPosition = startPosition.transform.position + new Vector3((endPosition.transform.position.x - startPosition.transform.position.x) * percentThere, (endPosition.transform.position.y - startPosition.transform.position.y) * percentThere, (endPosition.transform.position.z - startPosition.transform.position.z) * percentThere); //startPosition Vector3.Distance(startPosition.transform.position, endPosition.transform.position) / (1 - dis/1000);
+        Debug.Log(targetPosition);
+        if (distance <= 0)
         {
             Debug.Log("Game Lost");
             gm.Failure();
         }
+        crabTurn = true;
     }
 
     public void AddPitfall()
@@ -59,8 +77,7 @@ public class Crab : MonoBehaviour
 
     public void EnemyTurn()
     {
-        int temp = (int)Random.Range(0, 2);
-        Debug.Log(temp);
+        int temp = 0;// (int)Random.Range(0, 2);
         if(temp == 0)
         {
             if(pitfalls > 0)
@@ -85,8 +102,8 @@ public class Crab : MonoBehaviour
         else
         {
             gm.DamagePlayer(5);
+            gm.ReadyPlayerTurn();
         }
-        gm.ReadyPlayerTurn();
     }
 
 
