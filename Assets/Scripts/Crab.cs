@@ -19,14 +19,14 @@ public class Crab : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        distanceText.text = distance + " meters";
-        healthText.text = health.ToString();
+        distanceText.text = distance + " meters until CRABOCALYPSE";
+        healthText.text = "Crab Health: " + health.ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(crabTurn && targetPosition != null && Vector3.Distance(targetPosition, transform.position) > .5)
+        if (crabTurn && targetPosition != null && Vector3.Distance(targetPosition, transform.position) > .5)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, .1f);
         }
@@ -44,7 +44,7 @@ public class Crab : MonoBehaviour
     public void TakeDamage(int dmg)
     {
         health -= dmg;
-        healthText.text = health.ToString();
+        healthText.text = "Crab Health: " + health.ToString();
         if (health <= 0)
         {
             Debug.Log("Crab Defeated");
@@ -55,7 +55,7 @@ public class Crab : MonoBehaviour
     public void Move(int dis)
     {
         distance -= dis;
-        distanceText.text = distance + " meters";
+        distanceText.text = distance + " meters until CRABOCALYPSE";
         Debug.Log(distance);
         float percentThere = (1.0f - distance / 1000.0f);
         print(percentThere);
@@ -78,14 +78,14 @@ public class Crab : MonoBehaviour
     public void EnemyTurn()
     {
         int temp = 0;// (int)Random.Range(0, 2);
-        if(temp == 0)
+        if (temp == 0)
         {
-            if(pitfalls > 0)
+            if (pitfalls > 0)
             {
                 TakeDamage(2);
                 Move(15);
                 pitfalls--;
-                if(pitfalls > 0)
+                if (pitfalls > 0)
                 {
                     pitfallText.text = pitfalls + "Pitfalls";
                 }
