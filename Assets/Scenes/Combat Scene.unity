@@ -18851,7 +18851,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1094168442}
   m_LocalRotation: {x: -0, y: -0.9797155, z: -0, w: -0.2003938}
-  m_LocalPosition: {x: -129, y: -11.3, z: -94.8}
+  m_LocalPosition: {x: -129, y: -8.3, z: -94.8}
   m_LocalScale: {x: 20.000013, y: 20, z: 20.000013}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27498,7 +27498,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: abb5cc51aa6d3eb499420bd9847c04ec, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -11.3
+      value: -8.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: abb5cc51aa6d3eb499420bd9847c04ec, type: 3}
       propertyPath: m_LocalPosition.z
@@ -27565,6 +27565,8 @@ MonoBehaviour:
   distanceText: {fileID: 767790871}
   pitfallText: {fileID: 1945395666}
   gm: {fileID: 0}
+  startPosition: {fileID: 1094168442}
+  endPosition: {fileID: 1497476482}
   pitfalls: 0
 --- !u!4 &1592557129 stripped
 Transform:
