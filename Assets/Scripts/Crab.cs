@@ -15,8 +15,8 @@ public class Crab : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        distanceText.text = distance + " meters";
-        healthText.text = health.ToString();
+        distanceText.text = distance + " meters until CRABOCALYPSE!!";
+        healthText.text = "Crab Health: " + health.ToString();
     }
 
     // Update is called once per frame
@@ -32,7 +32,7 @@ public class Crab : MonoBehaviour
     public void TakeDamage(int dmg)
     {
         health -= dmg;
-        healthText.text = health.ToString();
+        healthText.text = "Crab Health: " + health.ToString();
         if (health <= 0)
         {
             Debug.Log("Crab Defeated");
@@ -43,7 +43,7 @@ public class Crab : MonoBehaviour
     public void Move(int dis)
     {
         distance -= dis;
-        distanceText.text = distance + " meters";
+        distanceText.text = distance + " meters until CRABOCALYPSE!!";
         if(distance <= 0)
         {
             Debug.Log("Game Lost");

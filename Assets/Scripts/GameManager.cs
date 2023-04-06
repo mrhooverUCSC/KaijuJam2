@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
         {
             playerHealth = 50;
         }
-        playerHealthText.text = playerHealth.ToString();
+        playerHealthText.text = "Player Health: " + playerHealth.ToString();
         if(playerHealth <= 0)
         {
             Debug.Log("player died");
