@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -73,7 +74,8 @@ public class GameManager : MonoBehaviour
     void Update() {
         
     }
-    public void PlayerAction(string action)
+    
+    public void PlayerAction(string action) //connected to the buttons on the main play screen, on the player's turn
     {
         //call the approrpriate action
         if(action == "FireCannons") {
@@ -91,15 +93,37 @@ public class GameManager : MonoBehaviour
         {
             b.interactable = false;
         }
+
+        //start the timer, which calls the exit function
+        if (action == "FireCannons")
+        {
+            StartCoroutine(PlayerActionTimer( CheckCannons() ));
+        }
+        else if (action == "MedicSquad")
+        {
+            StartCoroutine(PlayerActionTimer( MedicClose() ));
+        }
+        else if (action == "BlowPitfall")
+        {
+            StartCoroutine(PlayerActionTimer( CheckHole() ));
+        }
+
     }
-    public void ReadyPlayerTurn()
+    public IEnumerator PlayerActionTimer(IEnumerator end)
+    {
+        //Create the timer, click it down
+        yield return new WaitForSecondsRealtime(8f);
+        //if the minigame hasn't already ended, shut it down
+        StartCoroutine(end);
+    }
+    public void ReadyPlayerTurn() //called when the enemy's turn ends to prepare for the player's turn
     {
         foreach (Button b in playerActionButtons)
         {
             b.interactable = true;
         }
     }
-    public void DamagePlayer(int dmg)
+    public void DamagePlayer(int dmg) //reduces player's health and displays the change
     {
         playerHealth -= dmg;
         if(playerHealth >= 50)
@@ -246,7 +270,9 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void MedicClose() {
+    public IEnumerator MedicClose() {
+        yield return new WaitForSecondsRealtime(.6f);
+        //give feedback on how well the player did
         Debug.Log("Received a score of: " + MedicSquadCorrectPairings + "/" + MedicSquadNumberOfPairings);
         Debug.Log(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
         DamagePlayer(MedicSquadCorrectPairings / MedicSquadNumberOfPairings * -5);
@@ -285,7 +311,7 @@ public class GameManager : MonoBehaviour
 
         // Moves onto enemy turn once it reaches the last button pairing attempt
         if(MedicSquadAmountPaired >= MedicSquadNumberOfPairings) {
-            MedicClose();
+            StartCoroutine(MedicClose());
         }
 
     }
@@ -302,7 +328,7 @@ public class GameManager : MonoBehaviour
         //find 4 different positions
         while(stored.Count < 4)
         {
-            Vector2Int temp = new Vector2Int(Random.Range(1, 7), Random.Range(1, 7));
+            Vector2Int temp = new Vector2Int(UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7));
             if(checkForDuplicate(temp, stored) == true)
             {
                 continue;
@@ -347,7 +373,7 @@ public class GameManager : MonoBehaviour
     }
     public void Explode()
     {
-        //Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+        Debug.Log(EventSystem.current.currentSelectedGameObject.name);
         bombs--;
         Vector2Int temp = new Vector2Int(EventSystem.current.currentSelectedGameObject.name[0] - '0', EventSystem.current.currentSelectedGameObject.name[1] - '0');
         //Debug.Log(temp);
@@ -356,7 +382,7 @@ public class GameManager : MonoBehaviour
         FloodExplode(temp, 3, visited);
         if(bombs == 0)
         {
-            CheckHole();
+            StartCoroutine(CheckHole());
         }
     }
 
@@ -407,8 +433,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CheckHole()
+    private IEnumerator CheckHole()
     {
+        yield return new WaitForSecondsRealtime(.5f);
+        //highlight the best route? to show it was successful?
         if (HelperCheckHole())
         {
             //Debug.Log("path found");
