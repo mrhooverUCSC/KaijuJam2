@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     }
     GameState currentGameState = GameState.GO;
 
+    [SerializeField] GameObject turnTimer;
+    private bool inMinigame = false;
     //cannon variables
     List<int> CannonFire = new List<int> { 0,1,2,3,4 };
     int currentCannon;
@@ -37,7 +39,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject[] buttonGrid;
     int bombs;
 
-    [Header("Medic Variables")]     // medic variables
+    // medic variables
+    [Header("Medic Variables")]     
     [SerializeField] List<int> sce_Lineup;
     [SerializeField] List<int> sol_Lineup;
     [SerializeField] List<MedicSquadTypes> ScenarioOrder;
@@ -87,9 +90,9 @@ public class GameManager : MonoBehaviour
         {
             BlowPitfall();
         }
-
+        inMinigame = true;
         //disable the player buttons until their next turn
-        foreach(Button b in playerActionButtons)
+        foreach (Button b in playerActionButtons)
         {
             b.interactable = false;
         }
@@ -107,13 +110,34 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(PlayerActionTimer( CheckHole() ));
         }
-
     }
     public IEnumerator PlayerActionTimer(IEnumerator end)
     {
+        turnTimer.SetActive(true);
+
+        for (int i = 0; i < 80; ++i)
+        {
+            if (inMinigame == false)
+            {
+                turnTimer.SetActive(false);
+                break;
+            }
+            if (i % 10 == 0)
+            {
+                //Debug.Log();
+                Debug.Log("time is " + i + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.y + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.x + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.y);
+            }
+            yield return new WaitForSecondsRealtime(.1f);
+
+            turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(-60f - ((i/80f) * 290f), turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.y);
+            turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax = new Vector2(-25f - ((i / 80f) * 300), turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.y);
+            //turnTimer.GetComponentInChildren<RectTransform>().sizeDelta = new Vector2(30.0f + ((i / 80) * 290), turnTimer.GetComponentInChildren<RectTransform>().sizeDelta.y); //new Vector2(30 + ((i / 80) * 290), turnTimer.GetComponentInChildren<RectTransform>().offsetMax.y);
+        }
+        Debug.Log("time's up");
         //Create the timer, click it down
-        yield return new WaitForSecondsRealtime(8f);
+        //yield return new WaitForSecondsRealtime(8f);
         //if the minigame hasn't already ended, shut it down
+        turnTimer.SetActive(false);
         StartCoroutine(end);
     }
     public void ReadyPlayerTurn() //called when the enemy's turn ends to prepare for the player's turn
@@ -216,6 +240,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator CheckCannons()
     {
+        inMinigame = false;
         cannonUI.transform.GetChild(5).GetComponent<Image>().color = Color.green;
         yield return new WaitForSeconds(.5f);
         //hide the info
@@ -271,6 +296,7 @@ public class GameManager : MonoBehaviour
     }
 
     public IEnumerator MedicClose() {
+        inMinigame = false;
         yield return new WaitForSecondsRealtime(.6f);
         //give feedback on how well the player did
         Debug.Log("Received a score of: " + MedicSquadCorrectPairings + "/" + MedicSquadNumberOfPairings);
@@ -442,6 +468,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("path found");
             crab.AddPitfall();
         }
+        inMinigame = false;
         pitFallUI.SetActive(false);
         crab.EnemyTurn();
     }

@@ -77,7 +77,7 @@ public class Crab : MonoBehaviour
 
     public void EnemyTurn()
     {
-        int temp = 0;// (int)Random.Range(0, 2);
+        int temp = (int)Random.Range(0, 2);
         if (temp == 0)
         {
             if (pitfalls > 0)
