@@ -56,9 +56,9 @@ public class Crab : MonoBehaviour
     {
         distance -= dis;
         distanceText.text = distance + " meters until CRABOCALYPSE";
-        Debug.Log(distance);
+        //Debug.Log(distance);
         float percentThere = (1.0f - distance / 1000.0f);
-        print(percentThere);
+        //print(percentThere);
         targetPosition = startPosition.transform.position + new Vector3((endPosition.transform.position.x - startPosition.transform.position.x) * percentThere, (endPosition.transform.position.y - startPosition.transform.position.y) * percentThere, (endPosition.transform.position.z - startPosition.transform.position.z) * percentThere); //startPosition Vector3.Distance(startPosition.transform.position, endPosition.transform.position) / (1 - dis/1000);
         Debug.Log(targetPosition);
         if (distance <= 0)
