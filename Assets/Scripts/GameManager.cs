@@ -22,10 +22,12 @@ public class GameManager : MonoBehaviour
     }
     GameState currentGameState = GameState.GO;
 
+    [SerializeField] GameObject turnTimer;
+    private bool inMinigame = false;
     //cannon variables
     List<int> CannonFire = new List<int> { 0,1,2,3,4 };
     int currentCannon;
-    int currentCannonFails;
+    int currentCannonSuccesses;
     [SerializeField] GameObject cannonUI;
     int maxCannonDamage = 5;
 
@@ -37,7 +39,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject[] buttonGrid;
     int bombs;
 
-    [Header("Medic Variables")]     // medic variables
+    // medic variables
+    [Header("Medic Variables")]     
     [SerializeField] List<int> sce_Lineup;
     [SerializeField] List<int> sol_Lineup;
     [SerializeField] List<MedicSquadTypes> ScenarioOrder;
@@ -54,8 +57,8 @@ public class GameManager : MonoBehaviour
         DEAD = -3,
         OUTOFAMMO = -4,
         // ^ SCENARIOS ARE ABOVE (OUTPUT), v SOLUTIONS ARE BELOW (INPUT)
-        PLASTER = 1,
-        SPLINTS = 2,
+        SPLINTS = 1,
+        PLASTER = 2,
         REINFORCEMENTS = 3,
         RESUPPLY = 4
     }
@@ -87,9 +90,9 @@ public class GameManager : MonoBehaviour
         {
             BlowPitfall();
         }
-
+        inMinigame = true;
         //disable the player buttons until their next turn
-        foreach(Button b in playerActionButtons)
+        foreach (Button b in playerActionButtons)
         {
             b.interactable = false;
         }
@@ -107,13 +110,33 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(PlayerActionTimer( CheckHole() ));
         }
-
     }
     public IEnumerator PlayerActionTimer(IEnumerator end)
     {
+        turnTimer.SetActive(true);
+
+        for (int i = 0; i < 80; ++i)
+        {
+            if (inMinigame == false) //break out if the minigame is already over
+            {
+                turnTimer.SetActive(false);
+                yield break;
+            }
+            if (i % 10 == 0)
+            {
+                //Debug.Log("time is " + i + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.y + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.x + " | " + turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.y);
+            }
+            yield return new WaitForSecondsRealtime(.1f);
+
+            turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(-60f - ((i/80f) * 290f), turnTimer.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.y);
+            turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax = new Vector2(-25f - ((i / 80f) * 300), turnTimer.transform.GetChild(0).GetComponent<RectTransform>().offsetMax.y);
+            //turnTimer.GetComponentInChildren<RectTransform>().sizeDelta = new Vector2(30.0f + ((i / 80) * 290), turnTimer.GetComponentInChildren<RectTransform>().sizeDelta.y); //new Vector2(30 + ((i / 80) * 290), turnTimer.GetComponentInChildren<RectTransform>().offsetMax.y);
+        }
+        Debug.Log("time's up");
         //Create the timer, click it down
-        yield return new WaitForSecondsRealtime(8f);
+        //yield return new WaitForSecondsRealtime(8f);
         //if the minigame hasn't already ended, shut it down
+        turnTimer.SetActive(false);
         StartCoroutine(end);
     }
     public void ReadyPlayerTurn() //called when the enemy's turn ends to prepare for the player's turn
@@ -175,7 +198,7 @@ public class GameManager : MonoBehaviour
         //shuffle the inputs
         Shuffle(CannonFire);
         currentCannon = 0;
-        currentCannonFails = 0;
+        currentCannonSuccesses = 0;
         //turn them on in order
         yield return new WaitForSeconds(.5f);
         cannonUI.transform.GetChild(CannonFire[0]).gameObject.SetActive(true);
@@ -201,11 +224,11 @@ public class GameManager : MonoBehaviour
         if(CannonFire[currentCannon] == cannonNumber)
         {
             cannonUI.transform.GetChild(6 + currentCannon).GetComponent<Image>().color = Color.green;
+            currentCannonSuccesses++;
         }
         else
         {
             cannonUI.transform.GetChild(6 + currentCannon).GetComponent<Image>().color = Color.red;
-            currentCannonFails++;
         }
         cannonUI.transform.GetChild(6 + currentCannon).gameObject.SetActive(true);
         currentCannon++;
@@ -216,6 +239,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator CheckCannons()
     {
+        inMinigame = false;
         cannonUI.transform.GetChild(5).GetComponent<Image>().color = Color.green;
         yield return new WaitForSeconds(.5f);
         //hide the info
@@ -223,7 +247,8 @@ public class GameManager : MonoBehaviour
         {
             cannonUI.transform.GetChild(i).gameObject.SetActive(false);
         }
-        crab.TakeDamage(maxCannonDamage - currentCannonFails);
+        Debug.Log(currentCannonSuccesses);
+        crab.TakeDamage(currentCannonSuccesses);
         yield return new WaitForSeconds(.5f);
         crab.EnemyTurn();
         //CinematicCameraManager.instance.ChangeCameraMode(CinematicCameraManager.CameraMode.DYNAMIC);
@@ -271,6 +296,7 @@ public class GameManager : MonoBehaviour
     }
 
     public IEnumerator MedicClose() {
+        inMinigame = false;
         yield return new WaitForSecondsRealtime(.6f);
         //give feedback on how well the player did
         Debug.Log("Received a score of: " + MedicSquadCorrectPairings + "/" + MedicSquadNumberOfPairings);
@@ -325,13 +351,13 @@ public class GameManager : MonoBehaviour
         bombs = 3;
         terrain = new int[8,8];
         List<Vector2Int> stored = new List<Vector2Int>();
-        //find 4 different positions
+        //find 4 different positions, and their surroundings
         while(stored.Count < 4)
         {
             Vector2Int temp = new Vector2Int(UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7));
-            if(checkForDuplicate(temp, stored) == true)
+            if(checkForDuplicate(temp, stored))
             {
-                continue;
+                continue; //don't use it
             }
             stored.Add(temp);
         }
@@ -374,15 +400,18 @@ public class GameManager : MonoBehaviour
     public void Explode()
     {
         Debug.Log(EventSystem.current.currentSelectedGameObject.name);
-        bombs--;
-        Vector2Int temp = new Vector2Int(EventSystem.current.currentSelectedGameObject.name[0] - '0', EventSystem.current.currentSelectedGameObject.name[1] - '0');
-        //Debug.Log(temp);
-
-        List<Vector2Int> visited = new List<Vector2Int>();
-        FloodExplode(temp, 3, visited);
-        if(bombs == 0)
+        if(bombs > 0)
         {
-            StartCoroutine(CheckHole());
+            bombs--;
+            Vector2Int temp = new Vector2Int(EventSystem.current.currentSelectedGameObject.name[0] - '0', EventSystem.current.currentSelectedGameObject.name[1] - '0');
+            //Debug.Log(temp);
+
+            List<Vector2Int> visited = new List<Vector2Int>();
+            FloodExplode(temp, 3, visited);
+            if (bombs == 0)
+            {
+                StartCoroutine(CheckHole());
+            }
         }
     }
 
@@ -390,7 +419,7 @@ public class GameManager : MonoBehaviour
     {
         try
         {
-            Debug.Log(pos.ToString() + " " + strength + " " + terrain[pos.x, pos.y].ToString());
+            //Debug.Log(pos.ToString() + " " + strength + " " + terrain[pos.x, pos.y].ToString());
         }catch{}
         int str = strength;
         //if strength is 0 or negative, or pos outisde the map, return
@@ -401,7 +430,7 @@ public class GameManager : MonoBehaviour
         //if stone and can blow through, break
         else if (terrain[pos.x,pos.y] == 1 && str > 1)
         {
-            Debug.Log("Stone to None");
+            //Debug.Log("Stone to None");
             terrain[pos.x, pos.y] = -1;
             str--;
             buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = Color.white;
@@ -409,7 +438,7 @@ public class GameManager : MonoBehaviour
         //if stone but strength is 1, make into dirt
         else if(terrain[pos.x,pos.y] == 1 && str == 1)
         {
-            Debug.Log("Stone to Dirt");
+            //Debug.Log("Stone to Dirt");
             terrain[pos.x, pos.y] = 0;
             str--;
             buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = new Color(193 / 255f, 106 / 255f, 19 / 255f);
@@ -417,7 +446,7 @@ public class GameManager : MonoBehaviour
         //if dirt and strength 1 or more, break
         else if (terrain[pos.x, pos.y] == 0 && str > 0)
         {
-            Debug.Log("Dirt to None");
+            //Debug.Log("Dirt to None");
             terrain[pos.x, pos.y] = -1;
             buttonGrid[pos.x].transform.GetChild(pos.y).GetComponent<Image>().color = Color.white;
         }
@@ -442,6 +471,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("path found");
             crab.AddPitfall();
         }
+        inMinigame = false;
         pitFallUI.SetActive(false);
         crab.EnemyTurn();
     }
@@ -456,6 +486,11 @@ public class GameManager : MonoBehaviour
                 List<Vector2Int> visited = new List<Vector2Int>();
                 if (FloodCheckHole(visited, new Vector2Int(0, i)))
                 {
+                    foreach(Vector2Int l in visited)
+                    {
+                        Debug.Log("visited coloring:");
+                        buttonGrid[l.x].transform.GetChild(l.y).GetComponent<Image>().color = Color.green;
+                    }
                     return true;
                 }
             }
